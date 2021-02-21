@@ -17,6 +17,8 @@ function colorist(depth){
         return "tomato"
     }else if (depth >= 90){
         return "crimson"
+    }else{
+        return "Blue"
     };
 };
 
@@ -26,7 +28,7 @@ function quakeMap(earthquakeData) {
         //create marker for each earthquake
         var marker = L.circleMarker([feature.geometry.coordinates[1],feature.geometry.coordinates[0]],
             {
-                color: 'green',
+                color: colorist(feature.geometry.depth),
                 radius: (feature.properties.mag * 5),
                 fill: true,
                 fillOpacity: 1
