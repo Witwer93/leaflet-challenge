@@ -5,6 +5,7 @@ var quakeLayer = new L.LayerGroup()
 
 //function for determining color of markers based on earthquake depth
 //mimicked from leaflet documentation
+mapColors = ["#d73027", "#fc8d59", "#fee08b", "#d9ef8b", "#91cf60", "#1a9850"]
 function getColor(d)
 {
      return d > 90 ? "#d73027" :
@@ -89,7 +90,23 @@ function createMap(earthquakes){
         layers: [streetmap, quakeLayer]
         });
     
-        
+    //create map legend
+    var legend = L.control({position: 'bottomright'});
+    legend.onAdd = function (map) {
+
+        var div = L.DomUtil.create('div', 'legend');
+        div.innerHTML += "<h4>Magnitude</h4>";
+        div.innerHTML += `<i style="background: ${mapColors[5]}"></i><span>Less than 10</span><br>`;    
+        div.innerHTML += `<i style="background: ${mapColors[4]}"></i><span>10-30</span><br>`;    
+        div.innerHTML += `<i style="background: ${mapColors[3]}"></i><span>30-50</span><br>`;    
+        div.innerHTML += `<i style="background: ${mapColors[2]}"></i><span>50-70</span><br>`;    
+        div.innerHTML += `<i style="background: ${mapColors[1]}"></i><span>70-90</span><br>`;    
+        div.innerHTML += `<i style="background: ${mapColors[0]}"></i><span>90+</span><br>`;     
+    return div;
+    };
+    
+    legend.addTo(myMap);
+
     // Create a layer control with baseMaps and overlayMaps, add to map
     L.control.layers(baseMaps, overlayMaps, {
         collapsed: false
