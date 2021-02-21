@@ -1,23 +1,40 @@
 //create variable for data file
 var queryUrl = "https://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/all_week.geojson";
 
-d3.json(queryUrl, function(data) {
-    quakeMap(data.features);
-    //console.log(data.features)
-});
+
+var quakeLayer = new L.LayerGroup()
+
+function colorist(depth){
+    if (depth >= -10 && depth < 10) {
+        return "chartreuse"
+    }else if(depth >= 10 && depth < 30){
+        return "khaki"
+    }else if(depth >= 30 && depth < 50){
+        return "lightsalmon"
+    }else if (depth >= 50 && depth < 70){
+        return "coral"
+    }else if (depth >= 70 && depth < 90){
+        return "tomato"
+    }else if (depth >= 90){
+        return "crimson"
+    };
+};
 
 //function to retrieve features from earthquakes.json
 function quakeMap(earthquakeData) {
     function onEachFeature(feature, layer){    
         //create marker for each earthquake
-        var marker = L.marker([feature.geometry.coordinates[1],feature.geometry.coordinates[0]],
+        var marker = L.circleMarker([feature.geometry.coordinates[1],feature.geometry.coordinates[0]],
             {
-                color: 'yellow',
-                icon: 'circle'
-            });
+                color: 'green',
+                radius: (feature.properties.mag * 5),
+                fill: true,
+                fillOpacity: 1
+
+            }).addTo(quakeLayer);
         //create popups
-        marker.bindPopup("<p>" + (feature.properties.mag) + "</p>");
-        layer.bindPopup("<h3>" + feature.properties.mag + "</p>")
+        marker.bindPopup("<p>" + (feature.properties.mag) + "</p>").addTo(quakeLayer);
+        //layer.bindPopup("<h3>" + feature.properties.mag + "</p>")
     }
     var earthquakes = L.geoJSON(earthquakeData, {
         onEachFeature: onEachFeature            
@@ -25,6 +42,11 @@ function quakeMap(earthquakeData) {
 
     createMap(earthquakes)
 };
+
+d3.json(queryUrl, function(data) {
+    quakeMap(data.features);
+    //console.log(data.features)
+});
 
 function createMap(earthquakes){
     //create streetmap and darkmap layers
@@ -53,7 +75,7 @@ function createMap(earthquakes){
     
     //create earthquake overlay object
     var overlayMaps = {
-        "Earthquakes": earthquakes
+        "Earthquakes": quakeLayer
     };
     
     //create map variable
@@ -62,7 +84,7 @@ function createMap(earthquakes){
         37.09, -95.71
         ],
         zoom: 4,
-        layers: [streetmap, earthquakes]
+        layers: [streetmap, quakeLayer]
         });
     
         
