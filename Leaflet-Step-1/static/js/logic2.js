@@ -1,26 +1,18 @@
 //create variable for data file
 var queryUrl = "https://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/all_week.geojson";
 
-
 var quakeLayer = new L.LayerGroup()
 
 //function for determining color of markers based on earthquake depth
-function colorist(depth){
-    if (depth < 10) {
-        return "limegreen"
-    }else if(depth >= 10 && depth < 30){
-        return "greenyellow"
-    }else if(depth >= 30 && depth < 50){
-        return "orange"
-    }else if (depth >= 50 && depth < 70){
-        return "lightsalmon"
-    }else if (depth >= 70 && depth < 90){
-        return "orangered"
-    }else if (depth >= 90){
-        return "crimson"
-    }else{
-        return "Blue"
-    };
+//mimicked from leaflet documentation
+function getColor(d)
+{
+     return d > 90 ? "#d73027" :
+            d > 70 ? "#fc8d59" :
+            d > 50 ? "#fee08b" :
+            d > 30 ? "#d9ef8b" :
+            d > 10 ? "#91cf60" :
+                     "#1a9850" ;
 };
 
 //function to retrieve features from earthquakes.json
@@ -29,14 +21,20 @@ function quakeMap(earthquakeData) {
         //create marker for each earthquake
         var marker = L.circleMarker([feature.geometry.coordinates[1],feature.geometry.coordinates[0]],
             {
-                color: colorist(feature.geometry.coordinates[2]),
+                color: getColor(feature.geometry.coordinates[2]),
+                //color: colorist(feature.geometry.coordinates[2]),
                 radius: (feature.properties.mag * 3),
                 fill: true,
                 fillOpacity: 1
 
             }).addTo(quakeLayer);
         //create popups
-        marker.bindPopup("<p>" + (feature.properties.mag) + "</p>").addTo(quakeLayer);
+        marker.bindPopup
+        (
+            "<p> Magnitude: " + (feature.properties.mag) + "</p> \n" +
+            "<p> Location: " + (feature.properties.place) + "</p> \n" +
+            "<p> Time: " + (moment(feature.properties.time).format("HH:mm:ss")) + "</p> \n"
+        ).addTo(quakeLayer);
         //layer.bindPopup("<h3>" + feature.properties.mag + "</p>")
         
     }
